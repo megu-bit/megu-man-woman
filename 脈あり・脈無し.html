@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>脈アリ・脈ナシ診断 | MEGU 男の本音</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a0a14 0%, #2d1025 50%, #1a1535 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      font-family: -apple-system, 'Hiragino Kaku Gothic ProN', sans-serif;
+    }
+    .wrap { width: 100%; max-width: 480px; }
+    .brand {
+      text-align: center;
+      color: #c9a0b8;
+      font-size: 11px;
+      letter-spacing: 3px;
+      margin-bottom: 24px;
+    }
+    .card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 32px 28px;
+    }
+    .footer {
+      text-align: center;
+      color: rgba(255,255,255,0.2);
+      font-size: 11px;
+      margin-top: 20px;
+    }
+    /* COVER */
+    .cover-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, rgba(224,92,122,0.2), rgba(155,142,207,0.2));
+      border: 1px solid rgba(224,92,122,0.4);
+      border-radius: 16px;
+      padding: 10px 20px;
+      margin-bottom: 20px;
+      color: #e05c7a;
+      font-size: 12px;
+      letter-spacing: 2px;
+    }
+    .cover-title {
+      color: #fff;
+      font-size: 26px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      line-height: 1.3;
+      text-align: center;
+    }
+    .cover-title span { color: #e05c7a; }
+    .cover-sub {
+      color: #c9a0b8;
+      font-size: 14px;
+      margin-bottom: 32px;
+      line-height: 1.6;
+      text-align: center;
+    }
+    .feature-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 12px 16px;
+    }
+    .feature-item .icon { font-size: 18px; }
+    .feature-item span { color: #ddd; font-size: 14px; }
+    .recommend-box {
+      background: rgba(224,92,122,0.1);
+      border: 1px solid rgba(224,92,122,0.2);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 28px;
+    }
+    .recommend-box p.label { color: #c9a0b8; font-size: 12px; margin-bottom: 6px; }
+    .recommend-box p.body { color: #fff; font-size: 13px; line-height: 1.7; }
+    /* BUTTONS */
+    .btn-start {
+      width: 100%;
+      padding: 17px;
+      background: linear-gradient(135deg, #e05c7a, #9b8ecf);
+      border: none;
+      border-radius: 14px;
+      color: #fff;
+      font-size: 17px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: inherit;
+      letter-spacing: 1px;
+    }
+    .btn-next {
+      margin-top: 24px;
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #e05c7a, #9b8ecf);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .btn-next:disabled {
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.3);
+      cursor: not-allowed;
+    }
+    .btn-retry {
+      width: 100%;
+      padding: 14px;
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 12px;
+      color: #c9a0b8;
+      font-size: 14px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    /* QUIZ */
+    .progress-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .progress-row span { color: #c9a0b8; font-size: 12px; }
+    .progress-bar { background: rgba(255,255,255,0.1); border-radius: 99px; height: 4px; margin-bottom: 28px; }
+    .progress-fill {
+      background: linear-gradient(90deg, #e05c7a, #9b8ecf);
+      border-radius: 99px;
+      height: 4px;
+      transition: width 0.3s ease;
+    }
+    .question-text { color: #fff; font-size: 17px; font-weight: 600; line-height: 1.6; margin-bottom: 24px; }
+    .options { display: flex; flex-direction: column; gap: 10px; }
+    .opt-btn {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 14px 16px;
+      color: #c9a0b8;
+      font-size: 14px;
+      text-align: left;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+    .opt-btn.selected {
+      background: linear-gradient(135deg, rgba(224,92,122,0.3), rgba(155,142,207,0.3));
+      border: 1px solid rgba(224,92,122,0.7);
+      color: #fff;
+    }
+    /* RESULT */
+    .result-center { text-align: center; margin-bottom: 28px; }
+    .score-circle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      width: 110px;
+      height: 110px;
+      margin-bottom: 16px;
+    }
+    .score-num { font-size: 32px; font-weight: 800; color: #fff; }
+    .score-unit { font-size: 16px; color: #c9a0b8; }
+    .result-level { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+    .result-desc { color: #c9a0b8; font-size: 13px; }
+    .megu-box {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .megu-label { color: #c9a0b8; font-size: 11px; letter-spacing: 2px; margin-bottom: 10px; }
+    .megu-text { color: #fff; font-size: 14px; line-height: 1.8; }
+    .breakdown-label { color: #c9a0b8; font-size: 11px; letter-spacing: 2px; margin-bottom: 12px; }
+    .breakdown-list { margin-bottom: 24px; }
+    .breakdown-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .breakdown-q { color: #9a9aaa; font-size: 12px; flex: 1; margin-right: 8px; }
+    .breakdown-s { font-size: 12px; font-weight: 700; }
+    .phase { display: none; }
+    .phase.active { display: block; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand">MEGU | 男の本音</div>
+
+  <!-- COVER -->
+  <div id="cover" class="phase active">
+    <div class="card">
+      <div style="text-align:center">
+        <div class="cover-badge">脈アリ・脈ナシ 診断</div>
+        <h1 class="cover-title">彼は本当に<br>あなたに<span>脈アリ</span>？</h1>
+        <p class="cover-sub">気になる彼の行動から、<br>本音を見抜きます。</p>
+        <div class="feature-list">
+          <div class="feature-item"><span class="icon">📋</span><span>全8問・約2分で完了</span></div>
+          <div class="feature-item"><span class="icon">💯</span><span>脈アリ度をパーセンテージで判定</span></div>
+          <div class="feature-item"><span class="icon">💬</span><span>MEGUからのリアルなアドバイス付き</span></div>
+          <div class="feature-item"><span class="icon">🔄</span><span>何度でも診断できる</span></div>
+        </div>
+        <div class="recommend-box">
+          <p class="label">こんな人におすすめ</p>
+          <p class="body">・気になる人の気持ちが読めない<br>・脈アリなのか友達止まりか知りたい<br>・次の一手を迷っている</p>
+        </div>
+        <button class="btn-start" onclick="startQuiz()">診断スタート →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz" class="phase">
+    <div class="card">
+      <div class="progress-row">
+        <span id="q-counter">Q1 / 8</span>
+        <span id="q-pct">0%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+      <p class="question-text" id="question-text"></p>
+      <div class="options" id="options"></div>
+      <button class="btn-next" id="btn-next" disabled onclick="nextQuestion()">次へ</button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result" class="phase">
+    <div class="card">
+      <div class="result-center">
+        <div class="score-circle" id="score-circle">
+          <span class="score-num" id="score-num">0</span><span class="score-unit">%</span>
+        </div>
+        <p class="result-level" id="result-level"></p>
+        <p class="result-desc" id="result-desc"></p>
+      </div>
+      <div class="megu-box">
+        <p class="megu-label">MEGU から一言</p>
+        <p class="megu-text" id="megu-text"></p>
+      </div>
+      <div class="breakdown-list" id="breakdown-list">
+        <p class="breakdown-label">回答の内訳</p>
+      </div>
+      <button class="btn-retry" onclick="restart()">もう一度診断する</button>
+    </div>
+  </div>
+
+  <p class="footer">MEGU | 男の本音</p>
+</div>
+
+<script>
+const questions = [
+  { text: "LINEやDMの返信、どのくらいで来る？", options: [
+    { label: "数分〜1時間以内", score: 3 },
+    { label: "数時間以内", score: 2 },
+    { label: "その日のうち", score: 1 },
+    { label: "翌日以降or既読スルーも", score: 0 },
+  ]},
+  { text: "会話中、彼からの質問は多い？", options: [
+    { label: "よく質問してくる", score: 3 },
+    { label: "たまに聞いてくる", score: 2 },
+    { label: "ほぼ私から話している", score: 1 },
+    { label: "会話自体が少ない", score: 0 },
+  ]},
+  { text: "2人きりになる機会はある？", options: [
+    { label: "自然に2人になることが多い", score: 3 },
+    { label: "誘えば来てくれる", score: 2 },
+    { label: "グループのみ", score: 1 },
+    { label: "ほぼない", score: 0 },
+  ]},
+  { text: "あなたの変化（髪型・服装など）に気づく？", options: [
+    { label: "すぐ気づいて言ってくれる", score: 3 },
+    { label: "指摘すると気づく", score: 2 },
+    { label: "あまり気づかない", score: 1 },
+    { label: "全く気づかない", score: 0 },
+  ]},
+  { text: "彼との会話に「ボディタッチ」はある？", options: [
+    { label: "自然にある（肩・腕など）", score: 3 },
+    { label: "たまにある", score: 2 },
+    { label: "ほとんどない", score: 1 },
+    { label: "全くない", score: 0 },
+  ]},
+  { text: "あなたの予定や好みを覚えてる？", options: [
+    { label: "前に話したことを覚えてる", score: 3 },
+    { label: "たまに覚えてる", score: 2 },
+    { label: "あまり覚えていない", score: 1 },
+    { label: "全然覚えていない", score: 0 },
+  ]},
+  { text: "SNSで絡んでくる（いいね・コメントなど）？", options: [
+    { label: "よく反応してくれる", score: 3 },
+    { label: "たまにある", score: 2 },
+    { label: "ほぼない", score: 1 },
+    { label: "フォローすらしていない", score: 0 },
+  ]},
+  { text: "彼の「目線」や「表情」はどう感じる？", options: [
+    { label: "よく目が合う・笑顔が多い", score: 3 },
+    { label: "ときどき目が合う", score: 2 },
+    { label: "あまり意識されてない気がする", score: 1 },
+    { label: "視線を感じたことがない", score: 0 },
+  ]},
+];
+
+const meguComments = {
+  high: [
+    "彼の行動、かなり脈アリのサインが出てます。あとは自分から少し距離を縮めるだけ。待ってるだけじゃもったいないですよ。",
+    "これだけサインが揃ってるなら、彼はかなりあなたを意識してますね。自信を持って、もう一歩踏み込んでみて。",
+    "彼の態度はわかりやすいくらい好意的。あなたへの関心、ちゃんと伝わってきますよ。あとは流れに乗るだけですね。",
+  ],
+  mid_high: [
+    "好意のサインはあるけど、まだ確信には至らない段階。もう少し2人の時間を増やしてみると、彼の本音が見えてくるはずですよ。",
+    "彼なりに気にかけてはいるみたい。ただ、まだ様子見の段階かも。焦らず、自然な接点を増やしていくのが正解ですね。",
+    "完全に脈なしではないけど、まだ判断が難しいライン。彼にとってあなたが特別になるきっかけを作るといいですよ。",
+  ],
+  mid: [
+    "今のところ、彼の気持ちは読みにくい段階。ただ、関係性を深める余地はまだあります。焦らず、会話の質を上げてみて。",
+    "脈あり・脈なし、どちらとも言えない微妙なライン。彼の反応をもう少し観察しながら、自分の魅力を出していくといいですよ。",
+    "今は彼の中で友達以上恋愛未満の位置かも。印象を変えるひと押しが効いてくる時期ですね。",
+  ],
+  low: [
+    "正直、今は彼の意識があなたに向いていない可能性が高いですね。でも距離感は変えられます。まず接点を増やすことから始めてみて。",
+    "今の状態では、彼への一方通行になっているかも。自分磨きに集中しながら、自然に関係を育てていくのが賢い選択ですよ。",
+    "脈ナシ寄りだけど、諦めるには早い段階。彼にとって印象的な存在になることを意識してみると、流れが変わることもありますよ。",
+  ],
+};
+
+const getComment = (score) => {
+  const pool = score >= 19 ? meguComments.high
+    : score >= 13 ? meguComments.mid_high
+    : score >= 7 ? meguComments.mid
+    : meguComments.low;
+  return pool[Math.floor(Math.random() * pool.length)];
+};
+
+const getResult = (score) => {
+  if (score >= 19) return { level: "🔥 脈アリ確定", color: "#e05c7a", desc: "かなり高確率で好意あり" };
+  if (score >= 13) return { level: "💓 脈アリ寄り", color: "#d4808f", desc: "好意のサインが出ています" };
+  if (score >= 7)  return { level: "🌀 微妙ライン", color: "#9b8ecf", desc: "まだ判断できない段階" };
+  return { level: "💙 脈ナシ寄り", color: "#7faacc", desc: "今は距離がある可能性" };
+};
+
+let current = 0;
+let score = 0;
+let answers = [];
+let selectedScore = null;
+let selectedLabel = null;
+
+function showPhase(id) {
+  document.querySelectorAll('.phase').forEach(el => el.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startQuiz() {
+  current = 0; score = 0; answers = []; selectedScore = null; selectedLabel = null;
+  renderQuestion();
+  showPhase('quiz');
+}
+
+function renderQuestion() {
+  const q = questions[current];
+  const pct = Math.round((current / questions.length) * 100);
+  document.getElementById('q-counter').textContent = 'Q' + (current + 1) + ' / ' + questions.length;
+  document.getElementById('q-pct').textContent = pct + '%';
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('question-text').textContent = q.text;
+  const opts = document.getElementById('options');
+  opts.innerHTML = '';
+  q.options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.textContent = opt.label;
+    btn.onclick = () => selectOption(opt.label, opt.score, btn);
+    opts.appendChild(btn);
+  });
+  selectedScore = null;
+  selectedLabel = null;
+  const nextBtn = document.getElementById('btn-next');
+  nextBtn.disabled = true;
+  nextBtn.textContent = current + 1 === questions.length ? '診断する' : '次へ';
+}
+
+function selectOption(label, sc, btn) {
+  document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedScore = sc;
+  selectedLabel = label;
+  document.getElementById('btn-next').disabled = false;
+}
+
+function nextQuestion() {
+  if (selectedScore === null) return;
+  score += selectedScore;
+  answers.push({ a: selectedLabel, s: selectedScore });
+  if (current + 1 < questions.length) {
+    current++;
+    renderQuestion();
+  } else {
+    showResult();
+  }
+}
+
+function showResult() {
+  const pct = Math.round((score / 24) * 100);
+  const res = getResult(score);
+  const circle = document.getElementById('score-circle');
+  circle.style.background = 'linear-gradient(135deg, ' + res.color + '22, ' + res.color + '44)';
+  circle.style.border = '2px solid ' + res.color;
+  document.getElementById('score-num').textContent = pct;
+  const lvl = document.getElementById('result-level');
+  lvl.textContent = res.level;
+  lvl.style.color = res.color;
+  document.getElementById('result-desc').textContent = res.desc;
+  document.getElementById('megu-text').textContent = getComment(score);
+  const list = document.getElementById('breakdown-list');
+  list.innerHTML = '<p class="breakdown-label">回答の内訳</p>';
+  answers.forEach((a, i) => {
+    const row = document.createElement('div');
+    row.className = 'breakdown-row';
+    const color = a.s >= 2 ? '#e05c7a' : a.s === 1 ? '#9b8ecf' : '#7faacc';
+    row.innerHTML = '<span class="breakdown-q">Q' + (i+1) + ' ' + a.a + '</span><span class="breakdown-s" style="color:' + color + '">' + Math.round((a.s/3)*100) + '%</span>';
+    list.appendChild(row);
+  });
+  showPhase('result');
+}
+
+function restart() {
+  showPhase('cover');
+}
+</script>
+</body>
+</html>
